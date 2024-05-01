@@ -38,20 +38,11 @@ class runManager(object):
         self.maxMon  = self.dtStamp.strftime("%m")
         self.maxDay  = self.dtStamp.strftime("%d")
 
-        self.logfilename = "/home/mb471/software/aqfcdb/aqfcdb.log"
-        #self.logfilename = "/home/mark/softdev/aqfcdb/aqfcdb.log"
-
-        #self.logfilename = "./aqfcdb.log"
-
-        self.setLogFH(self.logfilename)
-
-        self.logfh.write("aqfcdb.py run:\n")
-        self.logfh.write("\tOn: {}\n".format(self.dtString))
         self.setCmdLineArgs()
 
-    def setLogFH(self, fname):
+    def setLogFH(self):
         try:
-            self.logfh = open(fname, 'a+')
+            self.logfh = open(self.prg_cfgdata["logfile"], 'a+')
         except IOError:
             print("\t***ERROR: Could not open run report file ({})\n".format(fname))
             raise SystemExit
@@ -121,6 +112,9 @@ class runManager(object):
         self.prg_cfgdata = json.load(self.cfgfh)
 
     def writeCfgData(self):
+            
+        self.logfh.write("aqfcdb.py run:\n")
+        self.logfh.write("\tOn: {}\n".format(self.dtString))
         self.logfh.write("\tCfg File: {}\n".format(self.cfgFile))
         self.logfh.write("\t\tUse Manual Date?: {}\n".format(self.prg_cfgdata["RunInformation"]["usemandate"]))
         self.logfh.write("\t\tManual Simulation Date: {}/{}/{}\n".format( 
@@ -441,10 +435,11 @@ if __name__ == '__main__':
     runMgr = runManager()
 
     runMgr.setProgramPath()
-    runlog = runMgr.getLogFH()
 
     runMgr.readCfgFile()
+    runMgr.setLogFH()
     runMgr.writeCfgData()
+    
     if runMgr.getUseManFlag():
         runMgr.validateMandate()
     if runMgr.getNumRetro() != 0:
@@ -477,4 +472,4 @@ if __name__ == '__main__':
     dbMgr.upsertDocuments(prodMgr.getPM251hr(), pm251hrProd)
     dbMgr.upsertDocuments(prodMgr.getPM2524hr(), pm2524hrProd)
 
-    runlog.close()
+    runMgr.getLogFH().close()
