@@ -3,8 +3,10 @@
   "usemandate": false,
   "mandate":{"year":2024,"month":2,"day":29},
   "minrunyear": 2000,
-  "modeldir": "/mnt/lulab/NRT-OUT/IMG/",
+  "netapp": "/mnt/lulab/NRT-OUT/IMG/",
+  "webdir": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST",
   "runprefix": "wrfgsi.plot.",
+  "runhistory": 181,
   "nretrodays": 14,
   "maxretrodays": 14
  }
