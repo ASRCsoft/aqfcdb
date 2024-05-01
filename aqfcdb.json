@@ -1,0 +1,11 @@
+{
+ "RunInformation":{
+  "usemandate": false,
+  "mandate":{"year":2024,"month":2,"day":29},
+  "minrunyear": 2000,
+  "modeldir": "/mnt/lulab/NRT-OUT/IMG/",
+  "runprefix": "wrfgsi.plot.",
+  "nretrodays": 14,
+  "maxretrodays": 14
+ }
+}
