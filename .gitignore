@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#Ignore log files and BASH script files
+*.log
+*.bs
+
 # C extensions
 *.so
 
