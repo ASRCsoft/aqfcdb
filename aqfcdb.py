@@ -42,7 +42,7 @@ class runManager(object):
 
     def setLogFH(self):
         try:
-            self.logfh = open(self.prg_cfgdata["logfile"], 'a+')
+            self.logfh = open(self.prg_cfgdata["RunInformation"]["logfile"], 'a+')
         except IOError:
             print("\t***ERROR: Could not open run report file ({})\n".format(fname))
             raise SystemExit
