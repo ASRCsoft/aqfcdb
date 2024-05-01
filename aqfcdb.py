@@ -383,8 +383,8 @@ class dbManager(object):
     
     def mkConnection(self):
         runlog.write("\t[INFO]: Establishing PyMongo client connection to remote database...\n")
-        un = runManager.getDBuname
-        pw = runManager.getDBpword
+        un = runMgr.getDBuname()
+        pw = runMgr.getDBpword()
 
         try:
             self.pmc = MongoClient('mongodb://%s:%s@api.asrc.albany.edu/aqfcst'%(un,pw))
