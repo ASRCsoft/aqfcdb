@@ -5,7 +5,7 @@
   "minrunyear": 2000,
   "logfile": "/home/mb471/software/aqfcdb/aqfcdb.log"
   "netapp": "/mnt/lulab/NRT-OUT/IMG/",
-  "webdir": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST",
+  "webdir": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST/",
   "runprefix": "wrfgsi.plot.",
   "runsuffix": "00",
   "runhistory": 181,
