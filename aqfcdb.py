@@ -80,6 +80,9 @@ class runManager(object):
 
     def getRunPrefix(self):
         return(self.prg_cfgdata["RunInformation"]["runprefix"])
+
+    def getRunSuffix(self):
+        return(self.prg_cfgdata["RunInformation"]["runsuffix"])
     
     def getNumRetro(self):
         return(self.prg_cfgdata["RunInformation"]["nretrodays"])
@@ -245,7 +248,7 @@ class simManager(object):
     def setFullPath(self,dateArg):
         baseDir = runMgr.getnetapp()
         prefix  = runMgr.getRunPrefix()
-        return(baseDir + prefix + dateArg + '00')
+        return(baseDir + prefix + dateArg + runMgr.getRunSuffix())
 
     def getDatesList(self):
         return(self.datesList)
