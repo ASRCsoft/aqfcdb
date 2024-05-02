@@ -78,6 +78,9 @@ class runManager(object):
     def getnetapp(self):
         return(self.prg_cfgdata["RunInformation"]["netapp"])
 
+    def getwebdir(self):
+        return(self.prg_cfgdata["RunInformation"]["webdir"])
+               
     def getRunPrefix(self):
         return(self.prg_cfgdata["RunInformation"]["runprefix"])
 
@@ -316,7 +319,7 @@ class processManager(object):
         # Note that for a given product, say hourly O3, we could have multiple run dates
         # if 'nretrodays' > 0 in the JSON config file! So we need to have a LIST to store
         # even if there is only one run date ultimately.
-        productList = []
+        productList = []   # Array of 'runObj' objects
 
         runlog.write("\t[INFO]: Collecting {} products...\n".format(productInfo['prodDesc']))
 
@@ -329,7 +332,8 @@ class processManager(object):
             # Initialize the run object for the current run date
             runObj = {
                 "runDate": dateList[d],
-                "fullPath": fullDirPath,
+                "netApp": fullDirPath,
+                "webDir": runMgr.getwebdir(),
                 "products": []
             }
 
