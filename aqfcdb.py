@@ -333,7 +333,7 @@ class processManager(object):
             runObj = {
                 "runDate": dateList[d],
                 "netApp": fullDirPath,
-                "webDir": runMgr.getwebdir(),
+                "webDir": runMgr.getwebdir() + dateList[d],
                 "products": []
             }
 
