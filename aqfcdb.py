@@ -474,7 +474,7 @@ if __name__ == '__main__':
         procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
 
         if ( (len(p_o31hr) != 0) && (len(p_o38hr) != 0) && (len(p_pm251hr) != 0) && (len(p_pm2524hr) != 0) ):
-            FC.Collection.append(
+            FC_Collection.append(
                 { "runDate" : dateList[d],
                   "netApp"  : runMgr.getnetapproot(),
                   "webDir"  : runMgr.getwebdirroot(),
@@ -484,12 +484,18 @@ if __name__ == '__main__':
                   "pm2524hr": p_pm2524hr
                 }
 
-    dbMgr = dbManager()
-    dbMgr.mkConnection()
-    dbMgr.testConnection()
-    dbMgr.upsertDocuments(prodMgr.getO31hr(), o31hrProd)
-    dbMgr.upsertDocuments(prodMgr.getO38hr(), o38hrProd)
-    dbMgr.upsertDocuments(prodMgr.getPM251hr(), pm251hrProd)
-    dbMgr.upsertDocuments(prodMgr.getPM2524hr(), pm2524hrProd)
+    if (len(FC_Collection) > 0):  # must have at least 1 forecast document to commit to database
+        #dbMgr = dbManager()
+        #dbMgr.mkConnection()
+        #dbMgr.testConnection()
+
+        for f in range(len(FC_Collection)):
+            #dbMgr.upsertDocuments(FC_Collection[f])
+            print(FC_Collection[f])
+                       
+        #dbMgr.upsertDocuments(prodMgr.getO31hr(), o31hrProd)
+        #dbMgr.upsertDocuments(prodMgr.getO38hr(), o38hrProd)
+        #dbMgr.upsertDocuments(prodMgr.getPM251hr(), pm251hrProd)
+        #dbMgr.upsertDocuments(prodMgr.getPM2524hr(), pm2524hrProd)
 
     runMgr.getLogFH().close()
