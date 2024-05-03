@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    aqfcdb.py - Reads AQ forecast directory, using base path 'netapp',
+    aqfcdb.py - Reads AQ forecast directory, using base path 'netapproot',
         run prefix 'runprefix' and simulation date 'rundate' all configured
         in the 'aqfcdb.json' input file; checks for all expected forecast
         files and generates missing file report saved in the aqfcdb.log file;
@@ -75,11 +75,11 @@ class runManager(object):
                 self.prg_cfgdata["RunInformation"]["rundate"]["month"],
                 self.prg_cfgdata["RunInformation"]["rundate"]["day"]))
 
-    def getnetapp(self):
-        return(self.prg_cfgdata["RunInformation"]["netapp"])
+    def getnetapproot(self):
+        return(self.prg_cfgdata["RunInformation"]["netapproot"])
 
-    def getwebdir(self):
-        return(self.prg_cfgdata["RunInformation"]["webdir"])
+    def getwebdirroot(self):
+        return(self.prg_cfgdata["RunInformation"]["webdirroot"])
                
     def getRunPrefix(self):
         return(self.prg_cfgdata["RunInformation"]["runprefix"])
@@ -127,7 +127,7 @@ class runManager(object):
             self.prg_cfgdata["RunInformation"]["mandate"]["month"],
             self.prg_cfgdata["RunInformation"]["mandate"]["day"],
             self.prg_cfgdata["RunInformation"]["mandate"]["year"]))
-        self.logfh.write("\t\tModel Directory: {}\n".format(self.prg_cfgdata["RunInformation"]["netapp"]))
+        self.logfh.write("\t\tModel Directory: {}\n".format(self.prg_cfgdata["RunInformation"]["netapproot"]))
         self.logfh.write("\t\tRun Prefix: {}\n".format(self.prg_cfgdata["RunInformation"]["runprefix"]))
         self.logfh.write("\t\t# of Retro Days : {}\n".format(self.prg_cfgdata["RunInformation"]["nretrodays"]))
         self.logfh.write("\t\tMax # Retro Days: {}\n".format(self.prg_cfgdata["RunInformation"]["maxretrodays"]))
@@ -184,7 +184,7 @@ class runManager(object):
 class simManager(object):
     def __init__(self):
 
-        self.simDir = runMgr.getnetapp()
+        self.simDir = runMgr.getnetapproot()
         self.simPre = runMgr.getRunPrefix()
         self.datesList = self.getSimDates()
         self.finalList = [] #contains dates for which simulation plot output directories exist
@@ -249,7 +249,7 @@ class simManager(object):
         runlog.write("\t[STAT]: Done.\n")
     
     def setFullPath(self,dateArg):
-        baseDir = runMgr.getnetapp()
+        baseDir = runMgr.getnetapproot()
         prefix  = runMgr.getRunPrefix()
         return(baseDir + prefix + dateArg + runMgr.getRunSuffix())
 
@@ -332,8 +332,8 @@ class processManager(object):
             # Initialize the run object for the current run date
             runObj = {
                 "runDate": dateList[d],
-                "netApp": fullDirPath,
-                "webDir": runMgr.getwebdir() + dateList[d],
+                "netapproot": fullDirPath,
+                "webDir": runMgr.getwebdirroot() + dateList[d],
                 "products": []
             }
 
