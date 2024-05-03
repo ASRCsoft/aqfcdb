@@ -476,7 +476,7 @@ if __name__ == '__main__':
         p_pm2524hr = procMgr.collectProduct(prodMgr.getPM2524hr(), fileList, dateList[d])
         procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
 
-        if ( (len(p_o31hr) != 0) && (len(p_o38hr) != 0) && (len(p_pm251hr) != 0) && (len(p_pm2524hr) != 0) ):
+        if ( (len(p_o31hr) != 0) and (len(p_o38hr) != 0) and (len(p_pm251hr) != 0) and (len(p_pm2524hr) != 0) ):
             FC_Collection.append(
                 { "runDate" : dateList[d],
                   "netApp"  : runMgr.getnetapproot(),
