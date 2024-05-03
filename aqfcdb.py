@@ -494,13 +494,12 @@ if __name__ == '__main__':
                 })
 
     if (len(FC_Collection) > 0):  # must have at least 1 forecast document to commit to database
-        #dbMgr = dbManager()
-        #dbMgr.mkConnection()
-        #dbMgr.testConnection()
+        dbMgr = dbManager()
+        dbMgr.mkConnection()
+        dbMgr.testConnection()
 
         for f in range(len(FC_Collection)):
-            #dbMgr.upsertDocuments(FC_Collection[f])
-            print(FC_Collection[f])
+            dbMgr.upsertDocuments(FC_Collection[f])
                        
         #dbMgr.upsertDocuments(prodMgr.getO31hr(), o31hrProd)
         #dbMgr.upsertDocuments(prodMgr.getO38hr(), o38hrProd)
