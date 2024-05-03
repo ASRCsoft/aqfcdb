@@ -232,7 +232,7 @@ class simManager(object):
         # Next check to make sure all of the plot output sub-directories (dates stored in 'datesList')
         # exist.  If any are missing, we won't abort, but will report in output log file. Also build
         # the "final" list of simulation dates (those where directories exist, but note, may not have
-        # any files)
+        # any files, or may be incomplete # of files for each product)
         
         for d in range(len(self.datesList)):
             fullDirPath = self.setFullPath(self.datesList[d])
@@ -251,11 +251,17 @@ class simManager(object):
     def setFullPath(self,dateArg):
         baseDir = runMgr.getnetapproot()
         prefix  = runMgr.getRunPrefix()
-        return(baseDir + prefix + dateArg + runMgr.getRunSuffix())
+        suffix  = runMgr.getRunSuffix()
+        return(baseDir + prefix + dateArg + suffix)
 
     def getDatesList(self):
         return(self.datesList)
-    
+
+    """
+    'finalList' is a list of simulation dates for simulation DIRECTORIES that exist.  This does not mean
+    there are files in each of the date directories, or that the correct # of files for each product are in
+    the each directory.  That check will be done in processManager.
+    """
     def getFinalList(self):
         return(self.finalList)
 
