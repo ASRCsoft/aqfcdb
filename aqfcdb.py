@@ -398,28 +398,25 @@ class dbManager(object):
         
         runlog.write("\t\t[STAT]: Ok.\n")
 
-    def upsertDocuments(self, pInfo, pList):
+    def upsertDocuments(self, fcDocument):
 
         # If a product already exists in the database (run date query), then update the 'fullPath'
         # and 'products' components in the existing document.  If it does not exist, insert into
         # the database
         db = self.pmc.aqfcst
 
-        runlog.write("\t[INFO]: Upserting {} products into database...\n".format(pInfo['prodDesc']))
-        coll = db[pInfo["dataCollection"]]
+        runlog.write("\t[INFO]: Upserting forecast document in database for {}...\n".format(fcDocument['runDate']))
+        coll = db["aq_forecasts"]
 
         for doc in pList:
-            coll.update_one (
-                { 'runDate': doc["runDate"] },
+        coll.update_one (
+                { "runDate": fcDocument["runDate"] },
                 { "$set":
-                    {
-                        'fullPath': doc["fullPath"], 'products': doc["products"]
-                    }
+                    { fcDocument }
                 },
                 upsert=True
             )
         
-        runlog.write("\t\t[STAT]: Done.\n")
 
 ######################################################################################################################
 
@@ -498,4 +495,5 @@ if __name__ == '__main__':
         #dbMgr.upsertDocuments(prodMgr.getPM251hr(), pm251hrProd)
         #dbMgr.upsertDocuments(prodMgr.getPM2524hr(), pm2524hrProd)
 
+    runlog.write("\t[STAT]: Done.\n")
     runMgr.getLogFH().close()
