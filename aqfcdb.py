@@ -321,43 +321,28 @@ class processManager(object):
     def __init__(self):
         pass
     
-    def collectProduct(self,productInfo):
-        # Note that for a given product, say hourly O3, we could have multiple run dates
-        # if 'nretrodays' > 0 in the JSON config file! So we need to have a LIST to store
-        # even if there is only one run date ultimately.
-        productList = []   # Array of 'runObj' objects
+    def collectProduct(self,productInfo, fList, dt):
 
-        runlog.write("\t[INFO]: Collecting {} products...\n".format(productInfo['prodDesc']))
+        productList = []   # Array of product filenames
 
-        dateList = simMgr.getFinalList()
-        for d in range(len(dateList)):
-            fullDirPath = simMgr.setFullPath(dateList[d])
-            runlog.write("\t\t[INFO]: Collecting product files from {}\n".format(fullDirPath))
-            fileList = os.listdir(fullDirPath)
-
-            # Initialize the run object for the current run date
-            runObj = {
-                "runDate": dateList[d],
-                "netapproot": fullDirPath,
-                "webDir": runMgr.getwebdirroot() + dateList[d],
-                "products": []
-            }
-
-            for f in fileList:
-                m = re.search(productInfo['preFix'],f)
-                if(m):      # found a current product file
-                    runObj['products'].append(f)
-
-            if len(runObj['products']) > 0:
-                runObj['products'].sort()
-                runlog.write("\t\t[STAT]: Found some, done\n")
-                productList.append(runObj)
-            else:
-                runlog.write("\t\t[WARN]: No products found for date {}\n".format(dateList[d]))
-
-            runlog.write("\t\t[STAT]: Done\n")
+        runlog.write("\t[INFO]: Collecting {} files for {} simulation...\n".format(productInfo["prodDesc"], dt))
         
-        return(productList)
+        for f in fileList:
+            m = re.search(productInfo['preFix'],f)
+            if(m):      # found a current product file
+                productList.append(f)
+
+        """
+        If we DO NOT have the expected number of files for this product, return an empty list.
+        This is a little heavy handed, but I think cleans up what the user sees via the web app.
+        """
+        if len(productList) != productInfo["nFiles"]:
+            runlog.write("\t\t[WARN]: Got {} files, expected {} for {} on {}\n".format(len(productList), productInfo["nFiles"], productInfo["prodDesc"],dt))
+            return([])  # return an empty list
+        else:
+            productList.sort()
+            runlog.write("\t\t[STAT]: OK\n")
+            return(productList)
     
     def checkProduct(self,pInfo,pList):
         #
