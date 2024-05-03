@@ -490,7 +490,7 @@ if __name__ == '__main__':
                   "o38hr"   : p_o38hr,
                   "pm251hr" : p_pm251hr,
                   "pm2524hr": p_pm2524hr
-                }
+                })
 
     if (len(FC_Collection) > 0):  # must have at least 1 forecast document to commit to database
         #dbMgr = dbManager()
