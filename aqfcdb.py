@@ -235,7 +235,7 @@ class simManager(object):
         # any files, or may be incomplete # of files for each product)
         
         for d in range(len(self.datesList)):
-            fullDirPath = self.setFullPath(self.datesList[d])
+            fullDirPath = self.getFullPath(self.datesList[d])
             if (not os.path.isdir(fullDirPath)):
                 runlog.write("\t\t[WARN]: Simulation sub-directory {} does not exist, skipping!\n".format(fullDirPath))
             else:
@@ -248,7 +248,7 @@ class simManager(object):
         
         runlog.write("\t[STAT]: Done.\n")
     
-    def setFullPath(self,dateArg):
+    def getFullPath(self,dateArg):
         baseDir = runMgr.getnetapproot()
         prefix  = runMgr.getRunPrefix()
         suffix  = runMgr.getRunSuffix()
@@ -430,10 +430,11 @@ class dbManager(object):
 
 if __name__ == '__main__':
 
+    FC_Collection = []    # Array list of forecast objects
+    
     runMgr = runManager()
 
     runMgr.setProgramPath()
-
     runMgr.readCfgFile()
     runMgr.setLogFH()
     runMgr.writeCfgData()
@@ -449,18 +450,44 @@ if __name__ == '__main__':
     
     prodMgr = productManager()
     procMgr = processManager()
-    
-    o31hrProd = procMgr.collectProduct(prodMgr.getO31hr())
-    procMgr.checkProduct(prodMgr.getO31hr(), o31hrProd)
 
-    o38hrProd = procMgr.collectProduct(prodMgr.getO38hr())
-    procMgr.checkProduct(prodMgr.getO38hr(),o38hrProd)
+    """
+    Note: A forecast collection is a simulation date document.  We'll only build a forecast document
+    object if we received ALL the product files for each product category (e.g. o31hr, o38hr, etc.).
+    Again, this is a little heavy handed, but in the end it makes the user experience in the web app
+    much cleaner.
+    """
+    # Loop over all the forecast dates
+    dateList = simMgr.getFinalList()
+    for d in range (len(dateList)):
+        fileList = os.listdir(simMgr.getFullPath(dateList[d]))
 
-    pm251hrProd = procMgr.collectProduct(prodMgr.getPM251hr())
-    procMgr.checkProduct(prodMgr.getPM251hr(),pm251hrProd)
+        p_o31hr = []
+        p_o31hr = procMgr.collectProduct(prodMgr.getO31hr(), fileList, dateList[d])
+        procMgr.checkProduct(prodMgr.getO31hr(), p_o31hr)
 
-    pm2524hrProd = procMgr.collectProduct(prodMgr.getPM2524hr())
-    procMgr.checkProduct(prodMgr.getPM2524hr(),pm2524hrProd)
+        p_o38hr = []
+        p_o38hr = procMgr.collectProduct(prodMgr.getO38hr(), fileList, dateList[d])
+        procMgr.checkProduct(prodMgr.getO38hr(),p_o38hr)
+
+        p_pm251hr = []
+        p_pm251hr = procMgr.collectProduct(prodMgr.getPM251hr(), fileList, dateList[d])
+        procMgr.checkProduct(prodMgr.getPM251hr(),p_pm251hr)
+        
+        p_pm2524hr = []
+        p_pm2524hr = procMgr.collectProduct(prodMgr.getPM2524hr(), fileList, dateList[d])
+        procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
+
+        if ( (len(p_o31hr) != 0) && (len(p_o38hr) != 0) && (len(p_pm251hr) != 0) && (len(p_pm2524hr) != 0) ):
+            FC.Collection.append(
+                { "runDate" : dateList[d],
+                  "netApp"  : runMgr.getnetapproot(),
+                  "webDir"  : runMgr.getwebdirroot(),
+                  "o31hr"   : p_o31hr,
+                  "o38hr"   : p_o38hr,
+                  "pm251hr" : p_pm251hr,
+                  "pm2524hr": p_pm2524hr
+                }
 
     dbMgr = dbManager()
     dbMgr.mkConnection()
