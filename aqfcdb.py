@@ -400,7 +400,7 @@ class dbManager(object):
 
     def upsertDocuments(self, fcDocument):
 
-        # If a product already exists in the database (run date query), then update the 'fullPath'
+        # If a product already exists in the database (runDate query), then update the 'fullPath'
         # and 'products' components in the existing document.  If it does not exist, insert into
         # the database
         db = self.pmc.aqfcst
@@ -408,11 +408,16 @@ class dbManager(object):
         runlog.write("\t[INFO]: Upserting forecast document in database for {}...\n".format(fcDocument['runDate']))
         coll = db["aq_forecasts"]
 
-        for doc in pList:
         coll.update_one (
                 { "runDate": fcDocument["runDate"] },
                 { "$set":
-                    { fcDocument }
+                    { "runDate" : fcDocument["runDate"],
+                      "netApp"  : fcDocument["netApp"],
+                      "webDir"  : fcDocument["webDir"],
+                      "o31hr"   : fcDocument["o31hr"],
+                      "o38hr"   : fcDocument["o38hr"],
+                      "pm251hr" : fcDocument["pm251hr"],
+                      "pm2524hr": fcDocument["pm2524hr"]
                 },
                 upsert=True
             )
