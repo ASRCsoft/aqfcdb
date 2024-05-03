@@ -335,11 +335,16 @@ class processManager(object):
             runlog.write("\t\t[WARN]: Got {} files, expected {} for {} on {}\n".format(len(productList), productInfo["nFiles"], productInfo["prodDesc"],dt))
             return([])  # return an empty list
         else:
+            """
+            W/O expliciting checking, we're assuming that we have all the correct files for a given product if
+            the number of products we retrieved is equal to the expected number of files in the product info catalog.
+            This may be a risky generalization but until I hear back from Sarah Lu et. al. we're going with it
+            """
             productList.sort()
             runlog.write("\t\t[STAT]: OK\n")
             return(productList)
     
-    def checkProduct(self,pInfo,pList):
+    #def checkProduct(self,pInfo,pList):
         #
         # Each product document now contains a run date, the full path of where the products
         # are located, and a list of the available files for that product (e.g. hourly O3)
@@ -350,24 +355,24 @@ class processManager(object):
         # in the product list (pList)
         #
 
-        runlog.write("\t[INFO]: Checking {} products...\n".format(pInfo['prodDesc']))
-        if len(pList) == 0:
-            runlog.write("\t\t[WARN]: No {} products found\n".format(pInfo['prodDesc']))
-        else:
-            for pdoc in pList:
-                thisDate = pdoc['runDate']
-                products = pdoc['products']
+        #runlog.write("\t[INFO]: Checking {} products...\n".format(pInfo['prodDesc']))
+        #if len(pList) == 0:
+            #runlog.write("\t\t[WARN]: No {} products found\n".format(pInfo['prodDesc']))
+        #else:
+            #for pdoc in pList:
+                #thisDate = pdoc['runDate']
+                #products = pdoc['products']
 
-                thisHour = pInfo['minHr']
-                while thisHour <= pInfo['maxHr']:
-                    hrStr = f"{thisHour:02}"
-                    fileName = pInfo['preFix'] + hrStr + '.' + pInfo['imgTyp']
+                #thisHour = pInfo['minHr']
+                #while thisHour <= pInfo['maxHr']:
+                    #hrStr = f"{thisHour:02}"
+                    #fileName = pInfo['preFix'] + hrStr + '.' + pInfo['imgTyp']
 
                     # check to see if the expected hour filename is in the product list
-                    if fileName not in products:
-                        runlog.write("\t\t[WARN]: File {} NOT FOUND for simulation date {}\n".format(fileName,thisDate))
+                    #if fileName not in products:
+                        #runlog.write("\t\t[WARN]: File {} NOT FOUND for simulation date {}\n".format(fileName,thisDate))
 
-                    thisHour = thisHour + 1
+                    #thisHour = thisHour + 1
 
 class dbManager(object):
 
@@ -462,19 +467,19 @@ if __name__ == '__main__':
 
         p_o31hr = []
         p_o31hr = procMgr.collectProduct(prodMgr.getO31hr(), fileList, dateList[d])
-        procMgr.checkProduct(prodMgr.getO31hr(), p_o31hr)
+        #procMgr.checkProduct(prodMgr.getO31hr(), p_o31hr)
 
         p_o38hr = []
         p_o38hr = procMgr.collectProduct(prodMgr.getO38hr(), fileList, dateList[d])
-        procMgr.checkProduct(prodMgr.getO38hr(),p_o38hr)
+        #procMgr.checkProduct(prodMgr.getO38hr(),p_o38hr)
 
         p_pm251hr = []
         p_pm251hr = procMgr.collectProduct(prodMgr.getPM251hr(), fileList, dateList[d])
-        procMgr.checkProduct(prodMgr.getPM251hr(),p_pm251hr)
+        #procMgr.checkProduct(prodMgr.getPM251hr(),p_pm251hr)
         
         p_pm2524hr = []
         p_pm2524hr = procMgr.collectProduct(prodMgr.getPM2524hr(), fileList, dateList[d])
-        procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
+        #procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
 
         if ( (len(p_o31hr) != 0) and (len(p_o38hr) != 0) and (len(p_pm251hr) != 0) and (len(p_pm2524hr) != 0) ):
             FC_Collection.append(
