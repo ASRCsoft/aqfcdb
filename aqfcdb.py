@@ -418,6 +418,7 @@ class dbManager(object):
                       "o38hr"   : fcDocument["o38hr"],
                       "pm251hr" : fcDocument["pm251hr"],
                       "pm2524hr": fcDocument["pm2524hr"]
+                    }
                 },
                 upsert=True
             )
