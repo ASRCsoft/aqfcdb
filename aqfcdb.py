@@ -440,6 +440,7 @@ if __name__ == '__main__':
     runMgr.setProgramPath()
     runMgr.readCfgFile()
     runMgr.setLogFH()
+    runlog = runMgr.getLogFH()
     runMgr.writeCfgData()
     
     if runMgr.getUseManFlag():
