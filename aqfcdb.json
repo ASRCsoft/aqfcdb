@@ -4,8 +4,8 @@
   "mandate":{"year":2024,"month":2,"day":29},
   "minrunyear": 2000,
   "logfile": "/home/mb471/software/aqfcdb/aqfcdb.log"
-  "netapp": "/mnt/lulab/NRT-OUT/IMG/",
-  "webdir": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST/",
+  "netapproot": "/mnt/lulab/NRT-OUT/IMG/",
+  "webdirroot": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST/",
   "runprefix": "wrfgsi.plot.",
   "runsuffix": "00",
   "runhistory": 181,
