@@ -7,12 +7,7 @@
         loads 'aqfcdb' MongoDB database located on the API server
 
     conda activate aqfcdb
-    python <path to script>/aqfcdb.py
-
-    Modification History:
-    Date        Who     What
-    20230911    MCB     Initial version. (Python 3.6+)
-
+    python <path to script>/aqfcdb.py <path to script>/aqfcdb.json
 """
 import os
 import sys
