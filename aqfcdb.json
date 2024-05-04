@@ -8,7 +8,7 @@
   "webdirroot": "/data/research/html/facstaff/lulab/images/WX-AQ/AQFCST/",
   "runprefix": "wrfgsi.plot.",
   "runsuffix": "00",
-  "runhistory": 181,
+  "maxdaystostore": 181,
   "nretrodays": 14,
   "maxretrodays": 14
  }
