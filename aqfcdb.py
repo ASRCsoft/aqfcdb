@@ -438,7 +438,7 @@ class dbManager(object):
     def getNumLocalDays(self):
         db = self.pmc.aqfcst
         coll = db["local_disk_info"]
-        coll.findOne({},{"_id":0})
+        coll.find_one({},{"_id":0})
         print(coll["numDaysLocal"])
         raise SystemExit
         
