@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """
-    aqfcdb.py - Reads AQ forecast directory, using base path 'netapproot',
-        run prefix 'runprefix' and simulation date 'rundate' all configured
-        in the 'aqfcdb.json' input file; checks for all expected forecast
-        files and generates missing file report saved in the aqfcdb.log file;
-        loads 'aqfcdb' MongoDB database located on the API server
+    Program: aqfcdb.py
+    Author: Mark Beauharnois
+    Org: University at Albany ASRC
 
     conda activate aqfcdb
-    python <path to script>/aqfcdb.py <path to script>/aqfcdb.json
+    (aqfcdb) python aqfcdy.py -u <db user> -p <db pa$$> aqfcdb.json
 """
 import os
 import sys
@@ -493,7 +491,11 @@ if __name__ == '__main__':
                   "pm2524hr": p_pm2524hr
                 })
 
-    if (len(FC_Collection) > 0):  # must have at least 1 forecast document to commit to database
+    """
+     Must have at least 1 forecast document to commit to database and store
+     to local disk
+    """
+    if (len(FC_Collection) > 0):  
         dbMgr = dbManager()
         dbMgr.mkConnection()
         dbMgr.testConnection()
