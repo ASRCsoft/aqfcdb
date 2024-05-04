@@ -378,7 +378,8 @@ class processManager(object):
 class dbManager(object):
 
     def __init__(self):
-        pass
+        self.mkConnection()
+        self.testConnection()
     
     def mkConnection(self):
         runlog.write("\t[INFO]: Establishing PyMongo client connection to remote database...\n")
@@ -391,7 +392,10 @@ class dbManager(object):
             runlog.write("\t\t[STAT]: Couldn't establish client connection, aborting.\n")
             print("\t***ERROR: Could not make connection to remote MongoDB instance\n".format)
             raise SystemExit
-    
+
+    def getConnection(self):
+        return(self.pmc)
+        
     def testConnection(self):
         runlog.write("\t[INFO]: Checking PyMongo client connection to remote database...\n")
         db = self.pmc.aqfcst
@@ -428,7 +432,27 @@ class dbManager(object):
                 },
                 upsert=True
             )
+
+    """
+      Get the current number of forecast day directories that are stored on local disk
+    """
+    def getNumLocalDays(self):
+        db = self.pmc.aqfcst
+        coll = db["local_disk_info"]
+        coll.findOne({},{"_id":0})
+        print(coll["numDaysLocal"])
+        raise SystemExit
         
+class fileManager(object):
+
+    def __init__(self):
+        """
+          maxDaysToStore : Maximum number of forecast days (directories of files) to save on local disk
+          nDaysStored    : The current number of forecast days on disk (loaded from database on 
+                           initialization, and updated upon end of file manager tasks
+        """
+        self.maxDaysToStore = runMgr.getMaxToStore()
+        self.nDaysStored = 0
 
 ######################################################################################################################
 
@@ -455,6 +479,10 @@ if __name__ == '__main__':
     
     prodMgr = productManager()
     procMgr = processManager()
+
+    dbMgr   = dbManager()
+    fileMgr = fileManager()
+    dbMgr.getNumLocalDays()
 
     """
     Note: A forecast collection is a simulation date document.  We'll only build a forecast document
@@ -499,17 +527,11 @@ if __name__ == '__main__':
      to local disk
     """
     if (len(FC_Collection) > 0):  
-        dbMgr = dbManager()
-        dbMgr.mkConnection()
-        dbMgr.testConnection()
 
         for f in range(len(FC_Collection)):
             dbMgr.upsertDocuments(FC_Collection[f])
                        
-        #dbMgr.upsertDocuments(prodMgr.getO31hr(), o31hrProd)
-        #dbMgr.upsertDocuments(prodMgr.getO38hr(), o38hrProd)
-        #dbMgr.upsertDocuments(prodMgr.getPM251hr(), pm251hrProd)
-        #dbMgr.upsertDocuments(prodMgr.getPM2524hr(), pm2524hrProd)
+
 
     runlog.write("\t[STAT]: Done.\n")
     runMgr.getLogFH().close()
