@@ -79,6 +79,9 @@ class runManager(object):
 
     def getRunSuffix(self):
         return(self.prg_cfgdata["RunInformation"]["runsuffix"])
+
+    def getMaxToStore(self):
+        return(self.prg_cfgdata["RunInformation"]["maxdaystostore"]
     
     def getNumRetro(self):
         return(self.prg_cfgdata["RunInformation"]["nretrodays"])
