@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     Program: aqfcdb.py
     Author: Mark Beauharnois
