@@ -447,7 +447,9 @@ class fileManager(object):
                 << THIS IS A BIG PROBLEM AND NEEDS REFINEMENT!! >>
 
     """
-      purgeForecasts : Removed 'ntr' forecast day directories from the local disk
+      purgeForecasts : Removed 'ntr' forecast day directories from the local disk.  Note that
+      we ALWAYS purge the 'ntr' OLDEST forecast directories, which is why we sort in ascending
+      (oldest to newest) date (directory name) order
     """
     def purgeForecasts(self, ntr):
         # 'ntr' - # of forecast day directories to remove from disk
