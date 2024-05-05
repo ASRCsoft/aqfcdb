@@ -316,7 +316,7 @@ class processManager(object):
     def __init__(self):
         pass
     
-    def collectProduct(self,productInfo, fList, dt):
+    def collectProduct(self, productInfo, fList, dt):
 
         productList = []   # Array of product filenames
 
@@ -328,21 +328,15 @@ class processManager(object):
                 productList.append(f)
 
         """
-        If we DO NOT have the expected number of files for this product, return an empty list.
-        This is a little heavy handed, but I think cleans up what the user sees via the web app.
+        If we DO NOT have the expected number of files for this product, log a warning message
         """
         if len(productList) != productInfo["nFiles"]:
             runlog.write("\t\t[WARN]: Got {} files, expected {} for {} on {}\n".format(len(productList), productInfo["nFiles"], productInfo["prodDesc"],dt))
-            return([])  # return an empty list
         else:
-            """
-            W/O expliciting checking, we're assuming that we have all the correct files for a given product if
-            the number of products we retrieved is equal to the expected number of files in the product info catalog.
-            This may be a risky generalization but until I hear back from Sarah Lu et. al. we're going with it
-            """
-            productList.sort()
             runlog.write("\t\t[STAT]: OK\n")
-            return(productList)
+            
+        productList.sort()
+        return(productList)
 
 class dbManager(object):
 
