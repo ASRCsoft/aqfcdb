@@ -470,7 +470,7 @@ class fileManager(object):
         basePath = runMgr.getwebdirroot()
         dirList  = os.listdir(basePath)
         dirList.sort()  # ascending date order
-
+        runlog.write("\t[INFO]: Purging {} forecast directories from local disk...\n".format(ntr))
         for d in range(ntr):
             dirName = dirList.pop(0)
             runlog.write("\t\t[INFO]: Removing forecast directory {} from local disk...\n".format(dirName))
@@ -480,7 +480,8 @@ class fileManager(object):
                 numRemoved = numRemoved + 1
             except OSError as e:
                 runlog.write("\t\t[STAT]: Error: {} - {}\n".format(e.filename, e.strerror))
-
+        
+        runlog.write("\t[STAT]: Removed {} of {} forecast directories...\n".format(numRemoved, ntr))
         return(numRemoved)
         
 ######################################################################################################################
