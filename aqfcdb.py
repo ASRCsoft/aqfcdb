@@ -8,11 +8,11 @@
 """
 import os
 import sys
+import shutil
 import json
 import re
 import argparse
 import datetime as dt
-from shutil import chown, copy2, Error
 from pymongo import MongoClient
 import urllib
 
@@ -471,7 +471,18 @@ class fileManager(object):
         dirList  = os.listdir(basePath)
         dirList.sort()  # ascending date order
 
-        for d in range(len(dirList))
+        for d in range(ntr):
+            dirName = dirList.pop(0)
+            runlog.write("\t\t[INFO]: Removing forecast directory {} from local disk...\n".format(dirName))
+            try:
+                shutil.rmtree(basePath+dirName)
+                runlog.write("\t\t[STAT]: Ok.\n")
+                numRemoved = numRemoved + 1
+            except OSError as e:
+                runlog.write("\t\t[STAT]: Error: {} - {}\n".format(e.filename, e.strerror))
+
+        return(numRemoved)
+        
 ######################################################################################################################
 
 if __name__ == '__main__':
