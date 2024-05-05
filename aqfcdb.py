@@ -391,9 +391,6 @@ class dbManager(object):
             runlog.write("\t\t[STAT]: Couldn't establish client connection, aborting.\n")
             print("\t***ERROR: Could not make connection to remote MongoDB instance\n".format)
             raise SystemExit
-
-    def getConnection(self):
-        return(self.pmc)
         
     def testConnection(self):
         runlog.write("\t[INFO]: Checking PyMongo client connection to remote database...\n")
@@ -439,8 +436,7 @@ class dbManager(object):
         db = self.pmc.aqfcst
         coll = db["local_disk_info"]
         document = coll.find_one({},{"_id":0})
-        print(document["numDaysLocal"])
-        raise SystemExit
+        return(document["numDaysLocal"])
         
 class fileManager(object):
 
@@ -451,8 +447,31 @@ class fileManager(object):
                            initialization, and updated upon end of file manager tasks
         """
         self.maxDaysToStore = runMgr.getMaxToStore()
-        self.nDaysStored = 0
+        self.nDaysStored = dbMgr.getNumLocalDays()
 
+    """
+     ckBndryCondition : Check condition where user reduced the size of 'maxdaystostore' in the JSON
+     config file.  We don't care if they increased it (disk storage is cheap right?) but we do care
+     if they decreased it to the point that it is LOWER than the current number of days stored on
+     local disk!  Right now 'maxdaystostore' is 181 (roughly 6 months (6X31)) in the JSON config file
+    """
+    def ckBndryCondition(self):
+        if self.nDaysStored > self.maxDaysToStore:
+            runlog.write("\t[IMPORTANT]: The # of forecast days on local disk ({}) EXCEEDS maximum number allowed ({})!!\n".format(self.nDaysStored, self.maxDaysToStore))
+            num_to_remove = self.nDaysStored - self.maxDaysToStore
+            num_removed = self.purgeForecasts(num_to_remove)
+
+    """
+      purgeForecasts : Removed 'ntr' forecast day directories from the local disk
+    """
+    def purgeForecasts(self, ntr):
+        # 'ntr' - # of forecast day directories to remove from disk
+        numRemoved = 0  # this ulimately gets returned
+        basePath = runMgr.getwebdirroot()
+        dirList  = os.listdir(basePath)
+        dirList.sort()  # ascending date order
+
+        for d in range(len(dirList))
 ######################################################################################################################
 
 if __name__ == '__main__':
@@ -481,7 +500,6 @@ if __name__ == '__main__':
 
     dbMgr   = dbManager()
     fileMgr = fileManager()
-    dbMgr.getNumLocalDays()
 
     """
     Note: A forecast collection is a simulation date document.  We'll only build a forecast document
@@ -525,12 +543,12 @@ if __name__ == '__main__':
      Must have at least 1 forecast document to commit to database and store
      to local disk
     """
-    if (len(FC_Collection) > 0):  
-
+    if (len(FC_Collection) > 0):
+        # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
             dbMgr.upsertDocuments(FC_Collection[f])
-                       
 
+        fileMgr.ckBndryCondition()
 
     runlog.write("\t[STAT]: Done.\n")
     runMgr.getLogFH().close()
