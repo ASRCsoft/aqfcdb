@@ -430,20 +430,22 @@ class fileManager(object):
      ckBndryCondition : Check condition where user reduced the size of 'maxdaystostore' in the JSON
      config file.  We don't care if they increased it (disk storage is cheap right?) but we do care
      if they decreased it to the point that it is LOWER than the current number of days stored on
-     local disk!
+     local disk! If this condition is true, the number of directories we would need to purge would
+     be 'nDaysStored' - 'maxDaysToStore', which would get us down to the maximum, but then we need
+     space for the current number of new forecasts that were processed which is passed in as 'nfcsts'
     """
-    def ckBndryCondition(self):
+    def ckBndryCondition(self, nfcsts):
         if self.nDaysStored > self.maxDaysToStore:
             runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) EXCEEDS maximum # allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
-            num_to_remove = self.nDaysStored - self.maxDaysToStore
+            num_to_remove = self.nDaysStored - self.maxDaysToStore - nfcsts
             num_removed = self.purgeForecasts(num_to_remove)
             if num_removed < num_to_remove:
                 # This is a critical condition because we needed to remove 'num_to_remove' directories
-                # but removed LESS than what was required, which means the 'nDaysStored' IS STILL >
-                # than the maximum allowed!
-                runlog.write("\t\t[CRITICAL]: Critical Local Disk Issue!\n")
+                # but removed LESS than what was required, which means we don't have enough room to store 
+                # the new forecasts on local disk!
+                runlog.write("\t\t[CRITICAL]: Critical Local Disk Management Issue!\n")
                 runlog.write("\t\t[CRITICAL]: Couldn't purge minimum # of forecasts - {} out of {} purged.\n".format(num_removed, num_to_remove))
-                runlog.write("\t\t[CRITICAL]: # forecasts on local disk exceeds maximum allowed - Check config file and potential local disk issues!\n")
+                runlog.write("\t\t[CRITICAL]: Not enough room to store new forecasts - Check config file and potential local disk issues!\n")
                 if num_removed != 0: # some were removed, update database
                     self.nDaysStored = self.nDaysStored - num_removed
                     dbMgr.setNumLocalDays(self.nDaysStored)
@@ -454,7 +456,11 @@ class fileManager(object):
             dbMgr.setNumLocalDays(self.nDaysStored)
 
     """
-      purgeForecasts : Removed 'ntr' forecast day directories from the local disk.  Note that
+     handleForecasts : 
+    """
+    
+    """
+      purgeForecasts : Removes 'ntr' forecast day directories from the local disk.  Note that
       we ALWAYS purge the 'ntr' OLDEST forecast directories, which is why we sort in ascending
       (oldest to newest) date (directory name) order.  Note that purgeForecasts should ONLY be
       executed if 'maxdaystostore' is REDUCED in the JSON config file, so that it creates a 
@@ -576,8 +582,8 @@ if __name__ == '__main__':
     if (len(FC_Collection) > 0):
 
         # Handle file management tasks for local storage (for web application).
-        fileMgr.ckBndryCondition() # special config file change case
-        fileMgr.
+        fileMgr.ckBndryCondition(len(FC_Collection))  # special config file change case
+        fileMgr.handleForecasts()   # the rest of the use cases
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
