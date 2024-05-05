@@ -437,16 +437,21 @@ class fileManager(object):
             runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) EXCEEDS maximum # allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
             num_to_remove = self.nDaysStored - self.maxDaysToStore
             num_removed = self.purgeForecasts(num_to_remove)
-            if num_removed != num_to_remove:
-                runlog.write("\t\t[CRITICAL]: {} out of {} forecast directories purged, check for potential local disk issues.\n".format(num_removed, num_to_remove))
-            else:
-                runlog.write("\t\t[INFO]: {} out of {} forecast directories purged, check for potential local disk issues.\n".format(num_removed, num_to_remove))
+            if num_removed < num_to_remove:
+                # This is a critical condition because we needed to remove 'num_to_remove' directories
+                # but removed LESS than what was required, which means the 'nDaysStored' IS STILL >
+                # than the maximum allowed!
+                runlog.write("\t\t[CRITICAL]: Critical Local Disk Issue!\n")
+                runlog.write("\t\t[CRITICAL]: Couldn't purge minimum # of forecasts - {} out of {} purged.\n".format(num_removed, num_to_remove))
+                runlog.write("\t\t[CRITICAL]: # forecasts on local disk exceeds maximum allowed - Check config file and potential local disk issues!\n")
+                if num_removed != 0: # some were removed, update database
+                    self.nDaysStored = self.nDaysStored - num_removed
+                    dbMgr.setNumLocalDays(self.nDaysStored)
+                raise SystemExit
             
-            if num_removed != 0:    # at least 1 of the forecast directories was removed
-                # Update in-memory copy of number of days (forecasts) stored on disk
-                self.nDaysStored = self.nDaysStored - num_removed
-                # Update database copy of number of days (forecasts) stored on disk
-                dbMgr.setNumLocalDays(self.nDaysStored)
+            # Correct number of directories were purged
+            self.nDaysStored = self.nDaysStored - num_removed
+            dbMgr.setNumLocalDays(self.nDaysStored)
 
     """
       purgeForecasts : Removed 'ntr' forecast day directories from the local disk.  Note that
@@ -569,11 +574,14 @@ if __name__ == '__main__':
      the file manager.
     """
     if (len(FC_Collection) > 0):
+
+        # Handle file management tasks for local storage (for web application).
+        fileMgr.ckBndryCondition() # special config file change case
+        fileMgr.
+        
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
             dbMgr.upsertDocuments(FC_Collection[f])
-
-        fileMgr.ckBndryCondition()
 
     runlog.write("\t[STAT]: Done.\n")
     runMgr.getLogFH().close()
