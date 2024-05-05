@@ -495,42 +495,54 @@ if __name__ == '__main__':
     fileMgr = fileManager()
 
     """
-    Note: A forecast collection is a simulation date document.  We'll only build a forecast document
-    object if we received ALL the product files for each product category (e.g. o31hr, o38hr, etc.).
-    Again, this is a little heavy handed, but in the end it makes the user experience in the web app
-    much cleaner.
+    Note: A forecast collection is a simulation date document.  There could be partial product
+    lists (files) for a given product, indicating a problem with the simulation of some sort.  We
+    should keep track of this information in a "simStatus" document field for the front-end web
+    application.  Therefore, we need to check each product.  Note that we're only doing a simple
+    "expected number of files for each product" check.  May have to revisit this design if web
+    application demands it.
     """
     # Loop over all the forecast dates
     dateList = simMgr.getFinalList()
     for d in range (len(dateList)):
         fileList = os.listdir(simMgr.getFullPath(dateList[d]))
-
+        simStatus = "NORMAL"  # assume everything ok at first
+        simMsg    = ""
+        
         p_o31hr = []
         p_o31hr = procMgr.collectProduct(prodMgr.getO31hr(), fileList, dateList[d])
-        #procMgr.checkProduct(prodMgr.getO31hr(), p_o31hr)
-
+        if len(p_o31hr) != prodMgr.getO31hr()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "O31HR incomplete # of products\n"
+            
         p_o38hr = []
         p_o38hr = procMgr.collectProduct(prodMgr.getO38hr(), fileList, dateList[d])
-        #procMgr.checkProduct(prodMgr.getO38hr(),p_o38hr)
-
+         if len(p_o38hr) != prodMgr.getO3hr()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "O38HR incomplete # of products\n"
+        
         p_pm251hr = []
         p_pm251hr = procMgr.collectProduct(prodMgr.getPM251hr(), fileList, dateList[d])
-        #procMgr.checkProduct(prodMgr.getPM251hr(),p_pm251hr)
+        if len(p_pm251hr) != prodMgr.getPM251hr()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "PM25HR incomplete # of products\n"
         
         p_pm2524hr = []
         p_pm2524hr = procMgr.collectProduct(prodMgr.getPM2524hr(), fileList, dateList[d])
-        #procMgr.checkProduct(prodMgr.getPM2524hr(),p_pm2524hr)
-
-        if ( (len(p_o31hr) != 0) and (len(p_o38hr) != 0) and (len(p_pm251hr) != 0) and (len(p_pm2524hr) != 0) ):
-            FC_Collection.append(
-                { "runDate" : dateList[d],
-                  "netApp"  : runMgr.getnetapproot(),
-                  "webDir"  : runMgr.getwebdirroot(),
-                  "o31hr"   : p_o31hr,
-                  "o38hr"   : p_o38hr,
-                  "pm251hr" : p_pm251hr,
-                  "pm2524hr": p_pm2524hr
-                })
+        if len(p_pm2524hr) != prodMgr.getPM2524hr()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "PM2524HR incomplete # of products\n"
+        
+        FC_Collection.append(
+            { "runDate" : dateList[d],
+              "netApp"  : runMgr.getnetapproot(),
+              "webDir"  : runMgr.getwebdirroot(),
+              "o31hr"   : p_o31hr,
+              "o38hr"   : p_o38hr,
+              "pm251hr" : p_pm251hr,
+              "pm2524hr": p_pm2524hr
+            }
+        )
 
     """
      Must have at least 1 forecast document to commit to database and store
