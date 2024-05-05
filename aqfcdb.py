@@ -430,7 +430,7 @@ class fileManager(object):
      ckBndryCondition : Check condition where user reduced the size of 'maxdaystostore' in the JSON
      config file.  We don't care if they increased it (disk storage is cheap right?) but we do care
      if they decreased it to the point that it is LOWER than the current number of days stored on
-     local disk!  Right now 'maxdaystostore' is 181 (roughly 6 months (6X31)) in the JSON config file
+     local disk!
     """
     def ckBndryCondition(self):
         if self.nDaysStored > self.maxDaysToStore:
@@ -438,12 +438,25 @@ class fileManager(object):
             num_to_remove = self.nDaysStored - self.maxDaysToStore
             num_removed = self.purgeForecasts(num_to_remove)
             if num_removed != num_to_remove:
-                << THIS IS A BIG PROBLEM AND NEEDS REFINEMENT!! >>
+                runlog.write("\t\t[CRITICAL]: {} out of {} forecast directories purged, check for potential local disk issues.\n".format(num_removed, num_to_remove))
+            else:
+                runlog.write("\t\t[INFO]: {} out of {} forecast directories purged, check for potential local disk issues.\n".format(num_removed, num_to_remove))
+            
+            if num_removed != 0:    # at least 1 of the forecast directories was removed
+                # Update in-memory copy of number of days (forecasts) stored on disk
+                self.nDaysStored = self.nDaysStored - num_removed
+                # Update database copy of number of days (forecasts) stored on disk
+                dbMgr.setNumLocalDays(self.nDaysStored)
 
     """
       purgeForecasts : Removed 'ntr' forecast day directories from the local disk.  Note that
       we ALWAYS purge the 'ntr' OLDEST forecast directories, which is why we sort in ascending
-      (oldest to newest) date (directory name) order
+      (oldest to newest) date (directory name) order.  Note that purgeForecasts should ONLY be
+      executed if 'maxdaystostore' is REDUCED in the JSON config file, so that it creates a 
+      state in which the current number of foreasts stored on local disk is > than the 
+      maximum allowed.  The other case where purgeForecasts is executed is when we are at our
+      maximum limit for the number of forecasts that can be retained on the local web directory
+      which means the current number of days stored is equal to the maximum.
     """
     def purgeForecasts(self, ntr):
         # 'ntr' - # of forecast day directories to remove from disk
