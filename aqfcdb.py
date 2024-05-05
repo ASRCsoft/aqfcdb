@@ -456,7 +456,7 @@ class fileManager(object):
             dbMgr.setNumLocalDays(self.nDaysStored)
 
     """
-     handleForecasts : 
+     fcManagement : 
     """
     
     """
@@ -583,7 +583,7 @@ if __name__ == '__main__':
 
         # Handle file management tasks for local storage (for web application).
         fileMgr.ckBndryCondition(len(FC_Collection))  # special config file change case
-        fileMgr.handleForecasts()   # the rest of the use cases
+        fileMgr.fcManagement()   # the rest of the use cases
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
