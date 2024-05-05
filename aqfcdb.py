@@ -535,6 +535,10 @@ if __name__ == '__main__':
         
         FC_Collection.append(
             { "runDate" : dateList[d],
+              "simStat" : simStatus,
+              "simMsg"  : simMsg,
+              "onDisk"  : "",
+              "offDiskReason" : "",
               "netApp"  : runMgr.getnetapproot(),
               "webDir"  : runMgr.getwebdirroot(),
               "o31hr"   : p_o31hr,
@@ -546,7 +550,10 @@ if __name__ == '__main__':
 
     """
      Must have at least 1 forecast document to commit to database and store
-     to local disk
+     to local disk.  Note that the file management process must be completed BEFORE
+     the database update because each forecast document needs to have it's 'onDisk'
+     flag set and 'offDiskReason' (if it's onDisk flag is "false") determined by 
+     the file manager.
     """
     if (len(FC_Collection) > 0):
         # Update/Insert the current forecast documents into the database
