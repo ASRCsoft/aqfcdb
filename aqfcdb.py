@@ -430,13 +430,27 @@ class dbManager(object):
             )
 
     """
-      Get the current number of forecast day directories that are stored on local disk
+      Get the current number of forecast day directories stored on local disk
     """
     def getNumLocalDays(self):
         db = self.pmc.aqfcst
         coll = db["local_disk_info"]
         document = coll.find_one({},{"_id":0})
         return(document["numDaysLocal"])
+    
+    """
+      Update the # of forecast day directories stored on local disk
+      'ndsVal' - Updated Number Days Stored Value 
+    """
+    def setNumLocalDays(self, ndsVal):
+        db = self.pmc.aqfcst
+        coll = db["local_disk_info"]
+        coll.update_one(
+            {},
+            { "$set" :
+                 { "numDaysLocal" : ndsVal }
+            }
+        )
         
 class fileManager(object):
 
@@ -457,7 +471,7 @@ class fileManager(object):
     """
     def ckBndryCondition(self):
         if self.nDaysStored > self.maxDaysToStore:
-            runlog.write("\t[IMPORTANT]: The # of forecast days on local disk ({}) EXCEEDS maximum number allowed ({})!!\n".format(self.nDaysStored, self.maxDaysToStore))
+            runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) EXCEEDS maximum # allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
             num_to_remove = self.nDaysStored - self.maxDaysToStore
             num_removed = self.purgeForecasts(num_to_remove)
 
