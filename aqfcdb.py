@@ -343,36 +343,6 @@ class processManager(object):
             productList.sort()
             runlog.write("\t\t[STAT]: OK\n")
             return(productList)
-    
-    #def checkProduct(self,pInfo,pList):
-        #
-        # Each product document now contains a run date, the full path of where the products
-        # are located, and a list of the available files for that product (e.g. hourly O3)
-        # for the run date.  Wade through each of the product documents checking the expected
-        # files.
-        #
-        # At this point, only run dates for a product that actually had files found will exist
-        # in the product list (pList)
-        #
-
-        #runlog.write("\t[INFO]: Checking {} products...\n".format(pInfo['prodDesc']))
-        #if len(pList) == 0:
-            #runlog.write("\t\t[WARN]: No {} products found\n".format(pInfo['prodDesc']))
-        #else:
-            #for pdoc in pList:
-                #thisDate = pdoc['runDate']
-                #products = pdoc['products']
-
-                #thisHour = pInfo['minHr']
-                #while thisHour <= pInfo['maxHr']:
-                    #hrStr = f"{thisHour:02}"
-                    #fileName = pInfo['preFix'] + hrStr + '.' + pInfo['imgTyp']
-
-                    # check to see if the expected hour filename is in the product list
-                    #if fileName not in products:
-                        #runlog.write("\t\t[WARN]: File {} NOT FOUND for simulation date {}\n".format(fileName,thisDate))
-
-                    #thisHour = thisHour + 1
 
 class dbManager(object):
 
@@ -439,8 +409,7 @@ class dbManager(object):
         return(document["numDaysLocal"])
     
     """
-      Update the # of forecast day directories stored on local disk
-      'ndsVal' - Updated Number Days Stored Value 
+      Update the # of forecast day directories stored on local disk using 'ndsVal'
     """
     def setNumLocalDays(self, ndsVal):
         db = self.pmc.aqfcst
@@ -474,6 +443,8 @@ class fileManager(object):
             runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) EXCEEDS maximum # allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
             num_to_remove = self.nDaysStored - self.maxDaysToStore
             num_removed = self.purgeForecasts(num_to_remove)
+            if num_removed != num_to_remove:
+                << THIS IS A BIG PROBLEM AND NEEDS REFINEMENT!! >>
 
     """
       purgeForecasts : Removed 'ntr' forecast day directories from the local disk
