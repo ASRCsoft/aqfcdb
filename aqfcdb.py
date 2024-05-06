@@ -461,15 +461,40 @@ class fileManager(object):
      it did exceed it, but we were able to successfully purge the requisite number of directories
      to make room for the incoming forecast directories. In this function, we check whether we
      need to clear directory space in order to store the new forecasts, and if so attempt to clear
-     the needed space.
+     the needed space.  The function returns the number of forecast directories that can actually
+     be stored (copied to local disk) by this run
     """
     def checkSpace(self, nfcsts):
         if self.nDaysStored == self.maxDaysToStore:
             # We've either been @ the maximum storage for awhile, or the user just reduced
             # it to new 'maxdaystostore' in JSON config file
             runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) @ maximum allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
-            num_to_remove = nfcsts
+            num_removed = self.purgeForecasts(nfcsts)
+            runlog.write("\t\t[INFO]: Removed {} of {} forecast directories.\n".format(num_removed, nfcsts))
+            if num_removed != nfcsts:
+                return (self.maxDaysToStore - num_removed)
+            else:
+                return (nfcsts)
+        elif self.nDaysStored + nfcsts > self.maxDaysToStore:
+            # Example:
+            #   nDaysStored    = 5
+            #   maxDaysToStore = 10
+            #   nfcsts         = 8
+            #   5 + 8 == 13, which is > 10
+            #   num_to_remove =  (nDaysStored + nfcsts) - maxDaysToStore
+            #                 =  (5 + 8) - 10 == 3
+            num_to_remove = (self.nDaysStored + nfcsts) - self.maxDaysToStore
+            runlog.write("\t[IMPORTANT]: # of forecasts on local disk ({}) + current # of forecasts ({}) > maximum allowed ({}), purging {}...\n"
+                         .format(self.nDaysStored, nfcsts, self.maxDaysToStore, num_to_remove))
             num_removed = self.purgeForecasts(num_to_remove)
+            runlog.write("\t\t[INFO]: Removed {} of {} forecast directories.\n".format(num_removed, num_to_remove))
+            if num_removed != num_to_remove:
+                return (nfcsts - (num_to_remove - num_removed))
+            else:
+                return (nfcsts)
+        else:
+            # Appears to be plenty of room to store current # of forecast directories (nfcsts)
+            return (nfcsts)
     
     """
       purgeForecasts : Removes 'ntr' forecast day directories from the local disk.  Note that
@@ -500,7 +525,13 @@ class fileManager(object):
         
         runlog.write("\t[STAT]: Removed {} of {} forecast directories...\n".format(numRemoved, ntr))
         return(numRemoved)
-        
+
+    """
+     copyForecasts : Given the number of forecast dates/directories that CAN be copied to local disk (mind you
+     this could be LESS than the number of new forecasts we want to copy to the local space), attempt to copy
+     the directories from NetAPP to local disk.  For each forecast along the way, update the 'onDisk' and 
+     'offDiskReason' fields in the document.
+    """
 ######################################################################################################################
 
 if __name__ == '__main__':
@@ -589,13 +620,15 @@ if __name__ == '__main__':
      to local disk.  Note that the file management process must be completed BEFORE
      the database update because each forecast document needs to have it's 'onDisk'
      flag set and 'offDiskReason' (if it's onDisk flag is "false") determined by 
-     the file manager.
+     the file manager, AND, we need to determine how many of the current forecasts
+     can actually be copied to local disk in the event there is a problem purging
+     the minimum # of existing directories
     """
     if (len(FC_Collection) > 0):
 
         # Handle file management tasks for local storage (for web application).
-        fileMgr.ckBndryCondition(len(FC_Collection))  # special config file change case
-        fileMgr.checkSpace(len(FC_Collection))        # check remaining space cases
+        fileMgr.ckBndryCondition(len(FC_Collection))          # special config file change case
+        num_to_copy = fileMgr.checkSpace(len(FC_Collection))  # check remaining space cases
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
