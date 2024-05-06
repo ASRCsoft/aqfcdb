@@ -529,8 +529,10 @@ class fileManager(object):
      copyForecasts : Given the number of forecast dates/directories that CAN be copied to local disk (mind you
      this could be LESS than the number of new forecasts we want to copy to the local space), attempt to copy
      the directories from NetAPP to local disk.  For each forecast along the way, update the 'onDisk' and 
-     'offDiskReason' fields in the document.
+     'offDiskReason' fields in the document. 'ntc' is # of forecast directories to copy.  The function works on
+     the global list of forecast collections 'FC_Collection' which is now sorted in ascending order by "runDate"
     """
+    def copyForecasts(self, ntc):
 ######################################################################################################################
 
 if __name__ == '__main__':
@@ -628,6 +630,9 @@ if __name__ == '__main__':
         # Handle file management tasks for local storage (for web application).
         fileMgr.ckBndryCondition(len(FC_Collection))          # special config file change case
         num_to_copy = fileMgr.checkSpace(len(FC_Collection))  # check remaining space cases
+        FC_Collection.sort(key=lambda x: x["runDate"])        # Get forecasts in order oldest to newest
+        num_copied = fileMgr.copyForecasts(num_to_copy)
+
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
