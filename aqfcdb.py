@@ -449,15 +449,27 @@ class fileManager(object):
                 if num_removed != 0: # some were removed, update database
                     self.nDaysStored = self.nDaysStored - num_removed
                     dbMgr.setNumLocalDays(self.nDaysStored)
-                raise SystemExit
+                    raise SystemExit
             
             # Correct number of directories were purged
             self.nDaysStored = self.nDaysStored - num_removed
             dbMgr.setNumLocalDays(self.nDaysStored)
 
     """
-     fcManagement : 
+     checkSpace : If we get here we passed the 'ckBndryCondition' test, where at runtime
+     the number of forecast directories on local disk didn't exceed the maximum allowed. Or,
+     it did exceed it, but we were able to successfully purge the requisite number of directories
+     to make room for the incoming forecast directories. In this function, we check whether we
+     need to clear directory space in order to store the new forecasts, and if so attempt to clear
+     the needed space.
     """
+    def checkSpace(self, nfcsts):
+        if self.nDaysStored == self.maxDaysToStore:
+            # We've either been @ the maximum storage for awhile, or the user just reduced
+            # it to new 'maxdaystostore' in JSON config file
+            runlog.write("\t[IMPORTANT]: # of forecast days on local disk ({}) @ maximum allowed ({}), purging...\n".format(self.nDaysStored, self.maxDaysToStore))
+            num_to_remove = nfcsts
+            num_removed = self.purgeForecasts(num_to_remove)
     
     """
       purgeForecasts : Removes 'ntr' forecast day directories from the local disk.  Note that
@@ -583,7 +595,7 @@ if __name__ == '__main__':
 
         # Handle file management tasks for local storage (for web application).
         fileMgr.ckBndryCondition(len(FC_Collection))  # special config file change case
-        fileMgr.fcManagement()   # the rest of the use cases
+        fileMgr.checkSpace(len(FC_Collection))        # check remaining space cases
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
