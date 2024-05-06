@@ -14,7 +14,6 @@ import re
 import argparse
 import datetime as dt
 from pymongo import MongoClient
-import urllib
 
 class runManager(object):
     def __init__(self):
