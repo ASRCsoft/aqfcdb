@@ -533,6 +533,7 @@ class fileManager(object):
      the global list of forecast collections 'FC_Collection' which is now sorted in ascending order by "runDate"
     """
     def copyForecasts(self, ntc):
+        
 ######################################################################################################################
 
 if __name__ == '__main__':
@@ -605,8 +606,7 @@ if __name__ == '__main__':
             { "runDate" : dateList[d],
               "simStat" : simStatus,
               "simMsg"  : simMsg,
-              "onDisk"  : "",
-              "offDiskReason" : "",
+              "onDisk"  : False,
               "netApp"  : runMgr.getnetapproot(),
               "webDir"  : runMgr.getwebdirroot(),
               "o31hr"   : p_o31hr,
