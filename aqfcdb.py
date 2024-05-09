@@ -528,11 +528,26 @@ class fileManager(object):
     """
      copyForecasts : Given the number of forecast dates/directories that CAN be copied to local disk (mind you
      this could be LESS than the number of new forecasts we want to copy to the local space), attempt to copy
-     the directories from NetAPP to local disk.  For each forecast along the way, update the 'onDisk' and 
-     'offDiskReason' fields in the document. 'ntc' is # of forecast directories to copy.  The function works on
-     the global list of forecast collections 'FC_Collection' which is now sorted in ascending order by "runDate"
+     the directories from NetAPP to local disk. The function works on the global list of forecast collections
+     'FC_Collection' which is now sorted in ascending order by "runDate". If there is any problem tyring to copy
+     a forecast from NetApp to local disk, we will update the database with the # of forecasts stored on disk,
+     write a system log message, and then terminate.
     """
     def copyForecasts(self, ntc):
+        runlog.write("\t[INFO] Copying {} of {} forecasts from NetApp to Local Disk...\n".format(ntc, len(FC_Collection)))
+        for n in range (ntc):
+            targetDir = os.path.join(runMgr.getwebdirroot(), FC_Collection[n]["runDate"])
+            sourceDir = os.path.join(runMgr.getnetapproot(), runMgr.getRunPrefix(), FC_Collection[n]["runDate"],
+                                     runMgr.getRunSuffix())
+            try:
+                shutil.copytree(sourceDir, targetDir, copy_function=copy, dirs_exist_ok=False)
+            except OSError as e:
+                runlog.write("\t\t[CRITICAL] Error {} - {}\n".format(e.filename, e.strerror))
+                dbMgr.setNumLocalDays(self.nDaysStored)
+                raise SystemExit
+
+            # Copy seems to have worked ok for this forecast
+            self.nDaysStored = 0
         
 ######################################################################################################################
 
