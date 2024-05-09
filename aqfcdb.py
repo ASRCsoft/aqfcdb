@@ -530,8 +530,8 @@ class fileManager(object):
      this could be LESS than the number of new forecasts we want to copy to the local space), attempt to copy
      the directories from NetAPP to local disk. The function works on the global list of forecast collections
      'FC_Collection' which is now sorted in ascending order by "runDate". If there is any problem tyring to copy
-     a forecast from NetApp to local disk, we will update the database with the # of forecasts stored on disk,
-     and return immediately since we don't want to try to copy any more subsequent forecasts to local disk.
+     a forecast from NetApp to local disk, we will return immediately since we don't want to try to copy any 
+     subsequent forecasts to local disk.
     """
     def copyForecasts(self, ntc):
         runlog.write("\t[INFO] Copying {} of {} forecasts from NetApp to Local Disk...\n".format(ntc, len(FC_Collection)))
@@ -544,10 +544,10 @@ class fileManager(object):
                 shutil.copytree(sourceDir, targetDir, copy_function=copy, dirs_exist_ok=False)
             except OSError as e:
                 runlog.write("\t\t[SERIOUS] Error {} - {}\n".format(e.filename, e.strerror))
-                dbMgr.setNumLocalDays(self.nDaysStored)
                 return(num_copied_ok)
 
             # Copy seems to have worked ok for this forecast
+            runlog.write("\t\t[INFO] Copied forecast {} from NetApp to Local Disk.\n".format(FC_Collection[n]["runDate"]))
             num_copied_ok = num_copied_ok + 1
             self.nDaysStored = self.nDaysStored + 1
             dbMgr.setNumLocalDays(self.nDaysStored)
@@ -653,7 +653,7 @@ if __name__ == '__main__':
         num_to_copy = fileMgr.checkSpace(len(FC_Collection))  # check remaining space cases
         FC_Collection.sort(key=lambda x: x["runDate"])        # Get forecasts in order oldest to newest
         num_copied = fileMgr.copyForecasts(num_to_copy)
-
+        runlog.write("\t\t[INFO] Copied {} of {}.\n".format(num_copied, num_to_copy))
         
         # Update/Insert the current forecast documents into the database
         for f in range(len(FC_Collection)):
