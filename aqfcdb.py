@@ -541,7 +541,7 @@ class fileManager(object):
             sourceDir = os.path.join(runMgr.getnetapproot(), runMgr.getRunPrefix(), FC_Collection[n]["runDate"],
                                      runMgr.getRunSuffix())
             try:
-                shutil.copytree(sourceDir, targetDir, copy_function=copy, dirs_exist_ok=False)
+                shutil.copytree(sourceDir, targetDir, dirs_exist_ok=False)
             except OSError as e:
                 runlog.write("\t\t[SERIOUS] Error {} - {}\n".format(e.filename, e.strerror))
                 return(num_copied_ok)
