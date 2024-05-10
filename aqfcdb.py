@@ -538,8 +538,8 @@ class fileManager(object):
         num_copied_ok = 0
         for n in range (ntc):
             targetDir = os.path.join(runMgr.getwebdirroot(), FC_Collection[n]["runDate"])
-            sourceDir = os.path.join(runMgr.getnetapproot(), runMgr.getRunPrefix(), FC_Collection[n]["runDate"],
-                                     runMgr.getRunSuffix())
+            srcDirnm  = runMgr.getRunPrefix() + FC_Collection[n]["runDate"] + runMgr.getRunSuffix()
+            sourceDir = os.path.join(runMgr.getnetapproot(), srcDirnm)
             try:
                 shutil.copytree(sourceDir, targetDir, dirs_exist_ok=False)
             except OSError as e:
