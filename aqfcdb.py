@@ -607,7 +607,7 @@ if __name__ == '__main__':
             
         p_o38hr = []
         p_o38hr = procMgr.collectProduct(prodMgr.getO38hr(), fileList, dateList[d])
-         if len(p_o38hr) != prodMgr.getO3hr()["nFiles"]:
+        if len(p_o38hr) != prodMgr.getO3hr()["nFiles"]:
             simStatus = "ALERT"
             simMsg = simMsg + "O38HR incomplete # of products\n"
         
