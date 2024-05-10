@@ -376,11 +376,16 @@ class dbManager(object):
 
         runlog.write("\t[INFO]: Upserting forecast document in database for {}...\n".format(fcDocument['runDate']))
         coll = db["aq_forecasts"]
-
+              "simStat" : simStatus,
+              "simMsg"  : simMsg,
+              "onDisk"  : False,
         coll.update_one (
                 { "runDate": fcDocument["runDate"] },
                 { "$set":
                     { "runDate" : fcDocument["runDate"],
+                      "simStat" : fcDocument["simStat"],
+                      "simMsg"  : fcDocument["simMsg"],
+                      "onDisk"  : fcDocument["onDisk"],
                       "netApp"  : fcDocument["netApp"],
                       "webDir"  : fcDocument["webDir"],
                       "o31hr"   : fcDocument["o31hr"],
