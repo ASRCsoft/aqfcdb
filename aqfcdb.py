@@ -267,8 +267,7 @@ class productManager(object):
             "minHr": 0,
             "maxHr": 54,
             "imgTyp": 'png',
-            "preFix": 'spa_O3_NYS_F',
-            "dataCollection": 'o31hr'
+            "preFix": 'spa_O3_NYS_F'
         }
         
         self.O38hr = {
@@ -277,8 +276,7 @@ class productManager(object):
             "minHr": 7,
             "maxHr": 54,
             "imgTyp": 'png',
-            "preFix": 'spa_8hrO3_NYS_F',
-            "dataCollection": 'o38hr'
+            "preFix": 'spa_8hrO3_NYS_F'
         }
 
         self.PM251hr = {
@@ -287,8 +285,7 @@ class productManager(object):
             "minHr": 0,
             "maxHr": 54,
             "imgTyp": 'png',
-            "preFix": 'spa_PM25_NYS_F',
-            "dataCollection": 'pm251hr'
+            "preFix": 'spa_PM25_NYS_F'
         }
 
         self.PM2524hr = {
@@ -297,8 +294,28 @@ class productManager(object):
             "minHr": 23,
             "maxHr": 54,
             "imgTyp": 'png',
-            "preFix": 'spa_24hrPM25_NYS_F',
-            "dataCollection": 'pm2524hr'
+            "preFix": 'spa_24hrPM25_NYS_F'
+        }
+
+        self.DMAX = {
+            "prodDesc": "Daily Maximums",
+            "nFiles": 4,
+            "imgTyp": 'png',
+            "preFix": 'spa_DMAX'
+        }
+
+        self.EVAL = {
+            "prodDesc": "Daily Evaluation",
+            "nFiles": 6,
+            "imgTyp": 'png',
+            "preFix": 'EVA'
+        }
+
+        self.T = {
+            "prodDesc": "Regional Analysis",
+            "nFiles": 2,
+            "imgTyp": 'png',
+            "preFix": 't'
         }
     
     def getO31hr(self):
@@ -309,6 +326,12 @@ class productManager(object):
         return(self.PM251hr)
     def getPM2524hr(self):
         return(self.PM2524hr)
+    def getDMAX(self):
+        return(self.DMAX)
+    def getEVAL(self):
+        return(self.EVAL)
+    def getT(self):
+        return(self.T)
 
 class processManager(object):
 
