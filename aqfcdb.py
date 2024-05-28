@@ -315,7 +315,7 @@ class productManager(object):
             "prodDesc": "Regional Analysis",
             "nFiles": 2,
             "imgTyp": 'png',
-            "preFix": 't'
+            "preFix": 't_'
         }
     
     def getO31hr(self):
@@ -345,7 +345,7 @@ class processManager(object):
         runlog.write("\t[INFO]: Collecting {} files for {} simulation...\n".format(productInfo["prodDesc"], dt))
         
         for f in fileList:
-            m = re.search(productInfo['preFix'],f)
+            m = re.match(productInfo['preFix'],f)
             if(m):      # found a current product file
                 productList.append(f)
 
