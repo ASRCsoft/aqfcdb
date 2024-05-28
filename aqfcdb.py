@@ -654,20 +654,20 @@ if __name__ == '__main__':
 
         p_dmax = []
         p_dmax = procMgr.collectProduct(prodMgr.getDMAX(), fileList, dateList[d])
-        if (len(p_dmax) != prodMgr.getDMAX()["nFiles"]:
+        if len(p_dmax) != prodMgr.getDMAX()["nFiles"]:
             simStatus = "ALERT"
             simMsg = simMsg + "DMAX incomplete # of products\n"
 
         
         p_eval = []
         p_eval = procMgr.collectProduct(prodMgr.getEVAL(), fileList, dateList[d])
-        if (len(p_eval) != prodMgr.getEVAL()["nFiles"]:
+        if len(p_eval) != prodMgr.getEVAL()["nFiles"]:
             simStatus = "ALERT"
             simMsg = simMsg + "Evaluation incomplete # of products\n"
         
         p_t = []
         p_t = procMgr.collectProduct(prodMgr.getT(), fileList, dateList[d])
-        if (len(p_t) != prodMgr.getT()["nFiles"]:
+        if len(p_t) != prodMgr.getT()["nFiles"]:
             simStatus = "ALERT"
             simMsg = simMsg + "T incomplete # of products\n"
             
