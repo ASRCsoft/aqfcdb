@@ -412,7 +412,10 @@ class dbManager(object):
                       "o31hr"   : fcDocument["o31hr"],
                       "o38hr"   : fcDocument["o38hr"],
                       "pm251hr" : fcDocument["pm251hr"],
-                      "pm2524hr": fcDocument["pm2524hr"]
+                      "pm2524hr": fcDocument["pm2524hr"],
+                      "dmax"    : fcDocument["dmax"],
+                      "eval"    : fcDocument["eval"],
+                      "t"       : fcDocument["t"]
                     }
                 },
                 upsert=True
@@ -648,7 +651,26 @@ if __name__ == '__main__':
         if len(p_pm2524hr) != prodMgr.getPM2524hr()["nFiles"]:
             simStatus = "ALERT"
             simMsg = simMsg + "PM2524HR incomplete # of products\n"
+
+        p_dmax = []
+        p_dmax = procMgr.collectProduct(prodMgr.getDMAX(), fileList, dateList[d])
+        if (len(p_dmax) != prodMgr.getDMAX()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "DMAX incomplete # of products\n"
+
         
+        p_eval = []
+        p_eval = procMgr.collectProduct(prodMgr.getEVAL(), fileList, dateList[d])
+        if (len(p_eval) != prodMgr.getEVAL()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "Evaluation incomplete # of products\n"
+        
+        p_t = []
+        p_t = procMgr.collectProduct(prodMgr.getT(), fileList, dateList[d])
+        if (len(p_t) != prodMgr.getT()["nFiles"]:
+            simStatus = "ALERT"
+            simMsg = simMsg + "T incomplete # of products\n"
+            
         FC_Collection.append(
             { "runDate" : dateList[d],
               "simStat" : simStatus,
@@ -659,7 +681,10 @@ if __name__ == '__main__':
               "o31hr"   : p_o31hr,
               "o38hr"   : p_o38hr,
               "pm251hr" : p_pm251hr,
-              "pm2524hr": p_pm2524hr
+              "pm2524hr": p_pm2524hr,
+              "dmax"    : p_dmax,
+              "eval"    : p_eval,
+              "t"       : p_t
             }
         )
 
