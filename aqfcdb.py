@@ -442,6 +442,21 @@ class dbManager(object):
                  { "numDaysLocal" : ndsVal }
             }
         )
+
+    """
+      When a forecast directory is removed from local disk, this function is called
+      to update the 'onDisk' status to 'False' for the corresponding forecast document
+      in the database. 'rDate' is the forecast run date.
+    """
+    def setOnDiskStatus(self, rDate):
+        db = self.pmc.aqfcst
+        coll = db["aq_forecasts"]
+        coll.update_one(
+            { "runDate": rDate },
+            { "$set" :
+                 { "onDisk" : False }
+            }
+        )
         
 class fileManager(object):
 
@@ -542,12 +557,14 @@ class fileManager(object):
         dirList.sort()  # ascending date order
         runlog.write("\t[INFO]: Purging {} forecast directories from local disk...\n".format(ntr))
         for d in range(ntr):
+            # Note that 'dirName' is in 'YYYYMMDD' format which corresponds nicely with forecast run date
             dirName = dirList.pop(0)
             runlog.write("\t\t[INFO]: Removing forecast directory {} from local disk...\n".format(dirName))
             try:
                 shutil.rmtree(basePath+dirName)
                 runlog.write("\t\t[STAT]: Ok.\n")
                 numRemoved = numRemoved + 1
+                dbMgr.setOnDiskStatus(dirName)    # Update onDisk status to False for removed forecast
             except OSError as e:
                 runlog.write("\t\t[STAT]: Error: {} - {}\n".format(e.filename, e.strerror))
         
